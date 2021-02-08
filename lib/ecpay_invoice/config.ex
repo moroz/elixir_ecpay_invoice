@@ -3,17 +3,18 @@ defmodule ECPayInvoice.Config do
   Convenience functions for working with ECPay credentials and configuration.
   """
 
-  @staging_gateway_params %{
-    merchant_id: "2000132",
-    hash_key: "ejCk326UnaZWKisg",
-    hash_iv: "q9jcZX8Ib9LM8wYk",
-    development: true
-  }
+  def get_config(profile_name \\ nil)
 
-  def get_hash_iv, do: Map.get(@staging_gateway_params, :hash_iv)
-  def get_hash_key, do: Map.get(@staging_gateway_params, :hash_key)
-  def development?, do: Map.get(@staging_gateway_params, :development)
-  def get_merchant_id, do: Map.get(@staging_gateway_params, :merchant_id)
+  def get_config(nil), do: Application.get_env(:ecpay_invoice, :profiles)
+
+  def get_config(profile_name), do: get_config(nil) |> Map.get(to_string(profile_name))
+
+  def get_hash_iv(profile_name \\ :staging), do: Map.get(get_config(profile_name), :hash_iv)
+  def get_hash_key(profile_name \\ :staging), do: Map.get(get_config(profile_name), :hash_key)
+  def development?(profile_name \\ :staging), do: Map.get(get_config(profile_name), :development)
+
+  def get_merchant_id(profile_name \\ :staging),
+    do: Map.get(get_config(profile_name), :merchant_id)
 
   def get_endpoint(path \\ "") do
     if development?() do

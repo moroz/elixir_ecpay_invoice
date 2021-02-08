@@ -4,11 +4,12 @@ defmodule EcpayInvoice.MixProject do
   def project do
     [
       app: :ecpay_invoice,
-      version: "0.0.1-alpha1",
+      version: "0.0.1-alpha2",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      package: package()
+      package: package(),
+      defaults: defaults()
     ]
   end
 
@@ -16,6 +17,19 @@ defmodule EcpayInvoice.MixProject do
   def application do
     [
       extra_applications: [:logger, :crypto, :inets, :ssl]
+    ]
+  end
+
+  defp defaults do
+    [
+      profiles: %{
+        "staging" => %{
+          merchant_id: "2000132",
+          hash_key: "ejCk326UnaZWKisg",
+          hash_iv: "q9jcZX8Ib9LM8wYk",
+          development: true
+        }
+      }
     ]
   end
 
