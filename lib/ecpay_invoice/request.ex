@@ -24,9 +24,16 @@ defmodule ECPayInvoice.Request do
     :httpc.request(:post, request, [], [])
   end
 
-  def handle_response({:ok, {{_, code, _}, headers, body}}) do
+  def handle_response({:ok, {{_, 200, _}, _headers, body}}) do
     data = Jason.decode!(body)
-    %{code: code, headers: headers, body: data, decrypted: decode_payload(data)}
+
+    case decode_payload(data) do
+      %{"RtnCode" => 1} = payload ->
+        {:ok, payload}
+
+      other ->
+        {:error, other}
+    end
   end
 
   defp decode_payload(%{"Data" => nil}), do: nil
