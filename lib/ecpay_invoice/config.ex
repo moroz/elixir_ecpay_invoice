@@ -20,8 +20,8 @@ defmodule ECPayInvoice.Config do
   def get_merchant_id(profile_name \\ :staging),
     do: Map.get(get_config(profile_name), :merchant_id)
 
-  def get_endpoint(path \\ "") do
-    if development?() do
+  def get_endpoint(path \\ "", profile \\ :staging) do
+    if development?(profile) do
       "https://einvoice-stage.ecpay.com.tw" <> path
     else
       "https://einvoice.ecpay.com.tw" <> path

@@ -6,15 +6,15 @@ defmodule ECPayInvoice.Request do
   alias ECPayInvoice.Payload
   alias ECPayInvoice.Crypto
 
-  def perform(%module{} = request) do
-    endpoint = Config.get_endpoint(module.endpoint())
+  def perform(%module{} = request, profile \\ :staging) do
+    endpoint = Config.get_endpoint(module.endpoint(), profile)
     payload = module.to_api_payload(request)
     generic_request(endpoint, payload)
   end
 
   def generic_request(endpoint, payload, profile \\ :staging)
       when is_binary(endpoint) and is_map(payload) do
-    data = Payload.encode(payload)
+    data = Payload.encode(payload, profile)
 
     post(endpoint, data)
     |> handle_response()
