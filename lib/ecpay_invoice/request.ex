@@ -4,6 +4,7 @@ defmodule ECPayInvoice.Request do
 
   alias ECPayInvoice.Config
   alias ECPayInvoice.Payload
+  alias ECPayInvoice.Crypto
 
   def perform(%module{} = request) do
     endpoint = Config.get_endpoint(module.endpoint())
@@ -24,6 +25,10 @@ defmodule ECPayInvoice.Request do
   end
 
   def handle_response({:ok, {{_, code, _}, headers, body}}) do
-    %{code: code, headers: headers, body: body}
+    data = Jason.decode!(body)
+    %{code: code, headers: headers, body: data, decrypted: decode_payload(data)}
   end
+
+  defp decode_payload(%{"Data" => nil}), do: nil
+  defp decode_payload(%{"Data" => string}), do: Crypto.decrypt_base64(string) |> Jason.decode!()
 end

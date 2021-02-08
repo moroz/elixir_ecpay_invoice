@@ -10,11 +10,9 @@ defmodule ECPayInvoice.Crypto do
     |> String.replace("%2A", "*")
     |> String.replace("%28", "(")
     |> String.replace("%29", ")")
-    |> String.replace("%40", "%2540")
-    |> String.replace("%257C", "%7C")
   end
 
-  def encrypt_payload(data, key \\ Config.get_hash_iv(), iv \\ Config.get_hash_iv())
+  def encrypt_payload(data, key \\ Config.get_hash_key(), iv \\ Config.get_hash_iv())
 
   def encrypt_payload(data, key, iv) when is_map(data) do
     Jason.encode!(data)
@@ -28,19 +26,19 @@ defmodule ECPayInvoice.Crypto do
     |> Base.encode64()
   end
 
-  def encrypt(data, key \\ Config.get_hash_iv(), iv \\ Config.get_hash_iv()) do
-    padded = PKCS7.pad(data)
-    :crypto.crypto_one_time(@cipher, key, iv, padded, true)
+  def encrypt(data, key \\ Config.get_hash_key(), iv \\ Config.get_hash_iv()) do
+    :crypto.crypto_one_time(@cipher, key, iv, data, encrypt: true, padding: :pkcs_padding)
   end
 
-  def decrypt(data, key \\ Config.get_hash_iv(), iv \\ Config.get_hash_iv())
+  def decrypt(data, key \\ Config.get_hash_key(), iv \\ Config.get_hash_iv())
       when is_binary(data) do
-    decrypted = :crypto.crypto_one_time(@cipher, key, iv, data, false)
-    encoded = PKCS7.unpad(decrypted)
-    URI.decode(encoded)
+    bytes =
+      :crypto.crypto_one_time(@cipher, key, iv, data, encrypt: false, padding: :pkcs_padding)
+
+    URI.decode(bytes)
   end
 
-  def decrypt_base64(data, key \\ Config.get_hash_iv(), iv \\ Config.get_hash_iv())
+  def decrypt_base64(data, key \\ Config.get_hash_key(), iv \\ Config.get_hash_iv())
       when is_binary(data) do
     decoded = Base.decode64!(data)
     decrypt(decoded, key, iv)
