@@ -1,0 +1,4 @@
+%{
+  "jason": {:hex, :jason, "1.2.2", "ba43e3f2709fd1aa1dce90aaabfd039d000469c05c56f0b8e31978e03fa39052", [:mix], [{:decimal, "~> 1.0 or ~> 2.0", [hex: :decimal, repo: "hexpm", optional: true]}], "hexpm", "18a228f5f0058ee183f29f9eae0805c6e59d61c3b006760668d8d18ff0d12179"},
+  "pkcs7": {:hex, :pkcs7, "1.0.2", "cd9d50177bfbd3fd80e8bc79d2941d3b2968b64bd1151ef3e54d8c4b2605ed7e", [:mix], [], "hexpm", "0e4faa65411e204b7952712d58f657335109ecbb24cf79163dc96458ba8d6518"},
+}
