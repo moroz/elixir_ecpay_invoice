@@ -12,4 +12,14 @@ defmodule ECPayInvoice.Config do
 
   def get_hash_iv, do: Map.get(@staging_gateway_params, :hash_iv)
   def get_hash_key, do: Map.get(@staging_gateway_params, :hash_key)
+  def development?, do: Map.get(@staging_gateway_params, :development)
+  def get_merchant_id, do: Map.get(@staging_gateway_params, :merchant_id)
+
+  def get_endpoint(path \\ "") do
+    if development?() do
+      "https://einvoice-stage.ecpay.com.tw" <> path
+    else
+      "https://einvoice.ecpay.com.tw" <> path
+    end
+  end
 end
