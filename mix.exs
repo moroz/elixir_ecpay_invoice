@@ -23,8 +23,7 @@ defmodule EcpayInvoice.MixProject do
   defp deps do
     [
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:jason, "~> 1.0"},
-      {:pkcs7, "~> 1.0"}
+      {:jason, "~> 1.0"}
     ]
   end
 
