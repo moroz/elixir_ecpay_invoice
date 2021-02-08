@@ -2,7 +2,7 @@ defmodule ECPayInvoice.Payload do
   alias ECPayInvoice.Config
   alias ECPayInvoice.Crypto
 
-  @spec encode(data :: map(), profile :: atom() | binary()) :: String.t()
+  @spec encode(data :: map(), profile :: atom() | binary()) :: binary()
   def encode(data, profile \\ :staging) when is_map(data) do
     Jason.encode!(%{
       MerchantID: Config.get_merchant_id(profile),

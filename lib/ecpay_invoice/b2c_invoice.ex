@@ -26,7 +26,7 @@ defmodule ECPayInvoice.B2CInvoice do
     customer_data = CustomerData.to_api_payload(invoice.customer_data)
 
     Map.merge(customer_data, %{
-      "MerchantId" => Config.get_merchant_id(),
+      "MerchantId" => Config.get_merchant_id(profile),
       "RelateNumber" => invoice.id || Helpers.generate_unique_id(),
       "Print" => Helpers.normalize_boolean(invoice.print),
       "Donation" => Helpers.normalize_boolean(invoice.donate),

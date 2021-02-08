@@ -12,6 +12,7 @@ defmodule ECPayInvoice.Crypto do
     |> String.replace("%29", ")")
   end
 
+  @spec encrypt_payload(data :: map() | binary(), profile :: atom() | binary()) :: binary()
   def encrypt_payload(data, profile \\ :staging)
 
   def encrypt_payload(data, profile) when is_map(data) do
@@ -25,6 +26,7 @@ defmodule ECPayInvoice.Crypto do
     end
   end
 
+  @spec encrypt_payload(data :: map() | binary(), key :: binary(), iv :: binary()) :: binary()
   def encrypt_payload(data, key, iv) when is_map(data) do
     Jason.encode!(data)
     |> encrypt_payload(key, iv)
