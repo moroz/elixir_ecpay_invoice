@@ -22,7 +22,7 @@ defmodule ECPayInvoice.B2CInvoice do
 
   def endpoint, do: "/B2CInvoice/Issue"
 
-  def to_api_payload(%B2CInvoice{} = invoice) do
+  def to_api_payload(%B2CInvoice{} = invoice, profile \\ :staging) do
     customer_data = CustomerData.to_api_payload(invoice.customer_data)
 
     Map.merge(customer_data, %{

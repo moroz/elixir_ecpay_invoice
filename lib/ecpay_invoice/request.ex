@@ -1,6 +1,6 @@
 defmodule ECPayInvoice.Request do
   @callback endpoint() :: String.t()
-  @callback to_api_payload(term()) :: map() | list()
+  @callback to_api_payload(struct :: term(), profile :: atom | String.t()) :: map() | list()
 
   alias ECPayInvoice.Config
   alias ECPayInvoice.Payload
@@ -12,7 +12,8 @@ defmodule ECPayInvoice.Request do
     generic_request(endpoint, payload)
   end
 
-  def generic_request(endpoint, payload) when is_binary(endpoint) and is_map(payload) do
+  def generic_request(endpoint, payload, profile \\ :staging)
+      when is_binary(endpoint) and is_map(payload) do
     data = Payload.encode(payload)
 
     post(endpoint, data)

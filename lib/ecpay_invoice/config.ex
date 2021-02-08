@@ -13,6 +13,10 @@ defmodule ECPayInvoice.Config do
   def get_hash_key(profile_name \\ :staging), do: Map.get(get_config(profile_name), :hash_key)
   def development?(profile_name \\ :staging), do: Map.get(get_config(profile_name), :development)
 
+  def get_key_and_iv(profile) do
+    {get_hash_key(profile), get_hash_iv(profile)}
+  end
+
   def get_merchant_id(profile_name \\ :staging),
     do: Map.get(get_config(profile_name), :merchant_id)
 

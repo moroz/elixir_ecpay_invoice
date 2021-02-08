@@ -12,7 +12,18 @@ defmodule ECPayInvoice.Crypto do
     |> String.replace("%29", ")")
   end
 
-  def encrypt_payload(data, key \\ Config.get_hash_key(), iv \\ Config.get_hash_iv())
+  def encrypt_payload(data, profile \\ :staging)
+
+  def encrypt_payload(data, profile) when is_map(data) do
+    Jason.encode!(data)
+    |> encrypt_payload(profile)
+  end
+
+  def encrypt_payload(data, profile) when is_binary(data) do
+    with {key, iv} <- Config.get_key_and_iv(profile) do
+      encrypt_payload(data, key, iv)
+    end
+  end
 
   def encrypt_payload(data, key, iv) when is_map(data) do
     Jason.encode!(data)
@@ -26,20 +37,34 @@ defmodule ECPayInvoice.Crypto do
     |> Base.encode64()
   end
 
-  def encrypt(data, key \\ Config.get_hash_key(), iv \\ Config.get_hash_iv()) do
+  def encrypt(data, profile \\ :staging) do
+    with {key, iv} <- Config.get_key_and_iv(profile) do
+      encrypt(data, key, iv)
+    end
+  end
+
+  def encrypt(data, key, iv) do
     :crypto.crypto_one_time(@cipher, key, iv, data, encrypt: true, padding: :pkcs_padding)
   end
 
-  def decrypt(data, key \\ Config.get_hash_key(), iv \\ Config.get_hash_iv())
+  def decrypt(data, profile \\ :staging)
       when is_binary(data) do
-    bytes =
-      :crypto.crypto_one_time(@cipher, key, iv, data, encrypt: false, padding: :pkcs_padding)
-
-    URI.decode(bytes)
+    with {key, iv} <- Config.get_key_and_iv(profile) do
+      decrypt(data, key, iv)
+    end
   end
 
-  def decrypt_base64(data, key \\ Config.get_hash_key(), iv \\ Config.get_hash_iv())
-      when is_binary(data) do
+  def decrypt(data, key, iv) do
+    :crypto.crypto_one_time(@cipher, key, iv, data, encrypt: false, padding: :pkcs_padding)
+    |> URI.decode()
+  end
+
+  def decrypt_base64(data, profile \\ :staging) when is_binary(data) do
+    decoded = Base.decode64!(data)
+    decrypt(decoded, profile)
+  end
+
+  def decrypt_base64(data, key, iv) when is_binary(data) do
     decoded = Base.decode64!(data)
     decrypt(decoded, key, iv)
   end
