@@ -4,19 +4,19 @@ defmodule EcpayInvoice.MixProject do
   def project do
     [
       app: :ecpay_invoice,
-      version: "0.0.1-alpha3",
+      version: "0.0.1-alpha4",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      package: package(),
-      defaults: defaults()
+      package: package()
     ]
   end
 
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :crypto, :inets, :ssl]
+      extra_applications: [:logger, :crypto, :inets, :ssl],
+      env: defaults()
     ]
   end
 
