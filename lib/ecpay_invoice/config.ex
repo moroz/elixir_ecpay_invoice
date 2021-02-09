@@ -3,21 +3,33 @@ defmodule ECPayInvoice.Config do
   Convenience functions for working with ECPay credentials and configuration.
   """
 
-  def get_config(profile_name \\ :staging),
-    do: Application.get_env(:ecpay_invoice, :profiles) |> Map.get(to_string(profile_name))
+  def default_profile, do: Application.get_env(:ecpay_invoice, :default_profile)
 
-  def get_hash_iv(profile_name \\ :staging), do: Map.get(get_config(profile_name), :hash_iv)
-  def get_hash_key(profile_name \\ :staging), do: Map.get(get_config(profile_name), :hash_key)
-  def development?(profile_name \\ :staging), do: Map.get(get_config(profile_name), :development)
+  def get_all_config, do: Application.get_env(:ecpay_invoice, :profiles)
+
+  def get_config(profile_name \\ default_profile())
+
+  def get_config(nil), do: get_config(default_profile())
+
+  def get_config(profile_name) when is_binary(profile_name) do
+    get_config(String.to_atom(profile_name))
+  end
+
+  def get_config(profile_name) when is_atom(profile_name) do
+    get_all_config() |> Map.get(profile_name)
+  end
+
+  def get_hash_iv(profile_name), do: Map.get(get_config(profile_name), :hash_iv)
+  def get_hash_key(profile_name), do: Map.get(get_config(profile_name), :hash_key)
+  def development?(profile_name), do: Map.get(get_config(profile_name), :development)
 
   def get_key_and_iv(profile) do
     {get_hash_key(profile), get_hash_iv(profile)}
   end
 
-  def get_merchant_id(profile_name \\ :staging),
-    do: Map.get(get_config(profile_name), :merchant_id)
+  def get_merchant_id(profile_name), do: Map.get(get_config(profile_name), :merchant_id)
 
-  def get_endpoint(path \\ "", profile \\ :staging) do
+  def get_endpoint(path, profile) do
     if development?(profile) do
       "https://einvoice-stage.ecpay.com.tw" <> path
     else

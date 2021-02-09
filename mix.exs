@@ -23,13 +23,14 @@ defmodule EcpayInvoice.MixProject do
   defp defaults do
     [
       profiles: %{
-        "staging" => %{
+        staging: %{
           merchant_id: "2000132",
           hash_key: "ejCk326UnaZWKisg",
           hash_iv: "q9jcZX8Ib9LM8wYk",
           development: true
         }
-      }
+      },
+      default_profile: :staging
     ]
   end
 
