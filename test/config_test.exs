@@ -1,9 +1,20 @@
 defmodule ECPayInvoice.ConfigTest do
   @moduledoc false
 
+  @otp_app :ecpay_invoice
+
   use ExUnit.Case
 
   alias ECPayInvoice.Config
+
+  defmacro with_config(key, config, do: block) do
+    quote do
+      existing_config = Application.get_env(@otp_app, unquote(key))
+      Application.put_env(@otp_app, unquote(key), unquote(config))
+      unquote(block)
+      Application.put_env(@otp_app, unquote(key), existing_config)
+    end
+  end
 
   @required_keys ~w(merchant_id hash_iv hash_key development)a
 
@@ -40,6 +51,30 @@ defmodule ECPayInvoice.ConfigTest do
       profile_name = Map.keys(all_config) |> List.first() |> to_string()
       actual = Config.get_config(profile_name)
       assert is_config(actual)
+    end
+
+    test "returns nil for non-existent profiles with atom keys" do
+      key = :non_existent
+      refute Config.get_config(key)
+    end
+
+    test "returns nil for non-existent profiles with string keys" do
+      key = "non_existent"
+      refute Config.get_config(key)
+    end
+
+    test "returns a profile configuration when called with no arguments" do
+      actual = Config.get_config()
+      assert is_config(actual)
+    end
+  end
+
+  describe "default_profile/0" do
+    test "returns the name of the default profile as atom" do
+      with_config(:default_profile, :some_value) do
+        actual = Config.default_profile()
+        assert actual == :some_value
+      end
     end
   end
 end
