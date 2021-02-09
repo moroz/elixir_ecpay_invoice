@@ -3,11 +3,8 @@ defmodule ECPayInvoice.Config do
   Convenience functions for working with ECPay credentials and configuration.
   """
 
-  def get_config(profile_name \\ nil)
-
-  def get_config(nil), do: Application.get_env(:ecpay_invoice, :profiles)
-
-  def get_config(profile_name), do: get_config(nil) |> Map.get(to_string(profile_name))
+  def get_config(profile_name \\ :staging),
+    do: Application.get_env(:ecpay_invoice, :profiles) |> Map.get(to_string(profile_name))
 
   def get_hash_iv(profile_name \\ :staging), do: Map.get(get_config(profile_name), :hash_iv)
   def get_hash_key(profile_name \\ :staging), do: Map.get(get_config(profile_name), :hash_key)

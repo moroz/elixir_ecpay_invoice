@@ -38,8 +38,7 @@ defmodule EcpayInvoice.MixProject do
     [
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:httpoison, "~> 1.8"},
-      {:jason, "~> 1.0"},
-      {:uuid, "~> 1.1"}
+      {:jason, "~> 1.0"}
     ]
   end
 

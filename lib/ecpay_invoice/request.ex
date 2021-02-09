@@ -14,8 +14,8 @@ defmodule ECPayInvoice.Request do
 
   def perform(%module{} = request, profile \\ :staging) do
     endpoint = Config.get_endpoint(module.endpoint(), profile)
-    payload = module.to_api_payload(request)
-    generic_request(endpoint, payload)
+    payload = module.to_api_payload(request, profile)
+    generic_request(endpoint, payload, profile)
   end
 
   def generic_request(endpoint, payload, profile \\ :staging)
@@ -23,17 +23,19 @@ defmodule ECPayInvoice.Request do
     data = Payload.encode(payload, profile)
 
     post(endpoint, data)
-    |> handle_response()
+    |> handle_response(profile)
   end
 
   def post(endpoint, body) do
     HTTPoison.post!(endpoint, body, @headers)
   end
 
-  def handle_response(%HTTPoison.Response{status_code: 200, body: body}) do
+  def handle_response(response, profile \\ :staging)
+
+  def handle_response(%HTTPoison.Response{status_code: 200, body: body}, profile) do
     data = Jason.decode!(body)
 
-    case decode_payload(data) do
+    case decode_payload(data, profile) do
       %{"RtnCode" => 1} = payload ->
         {:ok, payload}
 
@@ -42,10 +44,12 @@ defmodule ECPayInvoice.Request do
     end
   end
 
-  def handle_response(%HTTPoison.Response{status_code: 500, body: body}) do
+  def handle_response(%HTTPoison.Response{status_code: 500, body: body}, _profile) do
     {:error, :internal_server_error, body}
   end
 
-  defp decode_payload(%{"Data" => nil}), do: nil
-  defp decode_payload(%{"Data" => string}), do: Crypto.decrypt_base64(string) |> Jason.decode!()
+  defp decode_payload(%{"Data" => nil}, _profile), do: nil
+
+  defp decode_payload(%{"Data" => string}, profile),
+    do: Crypto.decrypt_base64(string, profile) |> Jason.decode!()
 end

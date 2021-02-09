@@ -8,7 +8,6 @@ defmodule ECPayInvoice.Payload do
       MerchantID: Config.get_merchant_id(profile),
       RqHeader: %{
         Timestamp: :os.system_time(:seconds),
-        RqId: UUID.uuid4(),
         Revision: "3.0.0"
       },
       Data: Crypto.encrypt_payload(data, profile)
