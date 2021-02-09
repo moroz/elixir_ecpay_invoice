@@ -1,6 +1,12 @@
 defmodule ECPayInvoice.Request do
   @callback endpoint() :: String.t()
   @callback to_api_payload(struct :: term(), profile :: atom | String.t()) :: map() | list()
+  require Logger
+
+  @headers [
+    {"Accept", "application/json, text/plain, */*"},
+    {"Content-Type", "application/json"}
+  ]
 
   alias ECPayInvoice.Config
   alias ECPayInvoice.Payload
@@ -21,11 +27,10 @@ defmodule ECPayInvoice.Request do
   end
 
   def post(endpoint, body) do
-    request = {to_charlist(endpoint), [], 'application/json', body}
-    :httpc.request(:post, request, [], [])
+    HTTPoison.post!(endpoint, body, @headers)
   end
 
-  def handle_response({:ok, {{_, 200, _}, _headers, body}}) do
+  def handle_response(%HTTPoison.Response{status_code: 200, body: body}) do
     data = Jason.decode!(body)
 
     case decode_payload(data) do
@@ -35,6 +40,10 @@ defmodule ECPayInvoice.Request do
       other ->
         {:error, other}
     end
+  end
+
+  def handle_response(%HTTPoison.Response{status_code: 500, body: body}) do
+    {:error, :internal_server_error, body}
   end
 
   defp decode_payload(%{"Data" => nil}), do: nil
