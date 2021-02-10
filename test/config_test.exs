@@ -7,6 +7,22 @@ defmodule ECPayInvoice.ConfigTest do
 
   alias ECPayInvoice.Config
 
+  defmacro with_config(config, do: block) do
+    quote do
+      existing_config = Application.get_all_env(@otp_app)
+
+      for {key, value} <- unquote(config) do
+        Application.put_env(@otp_app, key, value)
+      end
+
+      unquote(block)
+
+      for {key, value} <- existing_config do
+        Application.put_env(@otp_app, key, value)
+      end
+    end
+  end
+
   defmacro with_config(key, config, do: block) do
     quote do
       existing_config = Application.get_env(@otp_app, unquote(key))
@@ -74,6 +90,68 @@ defmodule ECPayInvoice.ConfigTest do
       with_config(:default_profile, :some_value) do
         actual = Config.default_profile()
         assert actual == :some_value
+      end
+    end
+  end
+
+  @sample_config [
+    profiles: %{
+      production: %{
+        development: false,
+        hash_iv: "4e160477e497e745",
+        hash_key: "550dd051e74ebe69",
+        merchant_id: "1234567"
+      },
+      development: %{
+        merchant_id: "2000132",
+        hash_key: "ejCk326UnaZWKisg",
+        hash_iv: "q9jcZX8Ib9LM8wYk",
+        development: true
+      }
+    },
+    default_profile: :production
+  ]
+
+  @configuration_keys ~w(merchant_id hash_key hash_iv)a
+
+  for key <- @configuration_keys do
+    function_name = :"get_#{key}"
+
+    describe "#{function_name}/1" do
+      test "returns #{key} from default profile when called with nil" do
+        with_config(@sample_config) do
+          actual = apply(Config, unquote(function_name), [nil])
+          expected = @sample_config[:profiles] |> Map.get(:production) |> Map.get(unquote(key))
+          assert actual == expected
+        end
+      end
+
+      test "returns #{key} from the named profile when called with atom key" do
+        with_config(@sample_config) do
+          actual = apply(Config, unquote(function_name), [:development])
+          expected = @sample_config[:profiles] |> Map.get(:development) |> Map.get(unquote(key))
+          assert actual == expected
+        end
+      end
+
+      test "returns merchant_id from the named profile when called with string key" do
+        with_config(@sample_config) do
+          actual = apply(Config, unquote(function_name), ["development"])
+          expected = @sample_config[:profiles] |> Map.get(:development) |> Map.get(unquote(key))
+          assert actual == expected
+        end
+      end
+
+      test "returns nil when called with a non-existent profile name as atom" do
+        with_config(@sample_config) do
+          nil = apply(Config, unquote(function_name), [:non_existent])
+        end
+      end
+
+      test "returns nil when called with a non-existent profile name as string" do
+        with_config(@sample_config) do
+          nil = apply(Config, unquote(function_name), ["non_existent"])
+        end
       end
     end
   end
