@@ -155,4 +155,39 @@ defmodule ECPayInvoice.ConfigTest do
       end
     end
   end
+
+  describe "development?/1" do
+    test "returns the set value for the default profile when called with nil" do
+      with_config(@sample_config) do
+        actual = Config.development?(nil)
+        refute actual
+      end
+    end
+
+    test "returns the set value for a named profile when called with name as atom" do
+      with_config(@sample_config) do
+        actual = Config.development?(:production)
+        refute actual
+      end
+    end
+
+    test "returns the set value for a named profile when called with name as string" do
+      with_config(@sample_config) do
+        actual = Config.development?("production")
+        refute actual
+      end
+    end
+
+    test "returns nil value for a non-existent profile called with string" do
+      with_config(@sample_config) do
+        nil = Config.development?("non_existent")
+      end
+    end
+
+    test "returns nil value for a non-existent profile called with atom" do
+      with_config(@sample_config) do
+        nil = Config.development?(:non_existent)
+      end
+    end
+  end
 end
