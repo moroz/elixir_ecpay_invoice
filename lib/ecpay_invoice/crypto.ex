@@ -10,6 +10,8 @@ defmodule ECPayInvoice.Crypto do
     |> String.replace("%2A", "*")
     |> String.replace("%28", "(")
     |> String.replace("%29", ")")
+    |> String.replace("%20", "+")
+    |> String.replace("%5F", "_")
   end
 
   @spec encrypt_payload(data :: map() | binary(), profile :: atom() | binary()) :: binary()
@@ -58,7 +60,7 @@ defmodule ECPayInvoice.Crypto do
 
   def decrypt(data, key, iv) do
     :crypto.crypto_one_time(@cipher, key, iv, data, encrypt: false, padding: :pkcs_padding)
-    |> URI.decode()
+    |> URI.decode_www_form()
   end
 
   def decrypt_base64(data, profile \\ :staging) when is_binary(data) do
