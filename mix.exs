@@ -4,7 +4,7 @@ defmodule EcpayInvoice.MixProject do
   def project do
     [
       app: :ecpay_invoice,
-      version: "0.0.1-alpha6",
+      version: "0.0.1-alpha7",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -46,8 +46,16 @@ defmodule EcpayInvoice.MixProject do
   defp package do
     [
       licenses: ["BSD-3"],
-      description: "An attempt at a client implementation for ECPay invoice API.",
-      links: %{}
+      description: """
+        Client library for the ECPay Invoice API provided by Green World
+        FinTech Service Co. (Taipei, Taiwan, Chinese name: 綠界科技股份有限公司).
+
+        This library is compatible with API revision 3.0.0, which talks to
+        the server using JSON payloads and uses AES encryption for verification.
+      """,
+      links: %{
+        "GitHub" => "https://github.com/moroz/elixir_ecpay_invoice"
+      }
     ]
   end
 end
