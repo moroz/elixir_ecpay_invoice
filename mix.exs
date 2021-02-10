@@ -4,7 +4,7 @@ defmodule EcpayInvoice.MixProject do
   def project do
     [
       app: :ecpay_invoice,
-      version: "0.0.1-alpha5",
+      version: "0.0.1-alpha6",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
