@@ -12,6 +12,7 @@ defmodule ECPayInvoice.Request do
   alias ECPayInvoice.Payload
   alias ECPayInvoice.Crypto
 
+  @spec perform(request :: struct(), profile :: atom()) :: {:ok, map()} | {:error, term()}
   def perform(%module{} = request, profile \\ :staging) do
     endpoint = Config.get_endpoint(module.endpoint(), profile)
     payload = module.to_api_payload(request, profile)

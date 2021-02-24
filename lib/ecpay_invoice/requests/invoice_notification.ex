@@ -28,6 +28,17 @@ defmodule ECPayInvoice.InvoiceNotification do
     struct!(__MODULE__, attrs)
   end
 
+  @spec send_email_issuance_notfication(invoice_no :: binary, email :: binary, profile :: atom()) ::
+          {:ok, map()} | {:error, term()}
+  def send_email_issuance_notfication(invoice_no, email, profile) do
+    payload = %Notification{
+      invoice_no: invoice_no,
+      email: email
+    }
+
+    ECPayInvoice.Request.perform(payload, profile)
+  end
+
   def new_from_invoice_response(%{"InvoiceNo" => invoice_no}) do
     %Notification{
       invoice_no: invoice_no

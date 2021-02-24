@@ -19,6 +19,8 @@ defmodule ECPayInvoice.B2CInvoice do
   alias ECPayInvoice.Config
   alias ECPayInvoice.Helpers
   alias ECPayInvoice.CustomerData
+  alias ECPayInvoice.Request
+  alias ECPayInvoice.InvoiceNotification
 
   def endpoint, do: "/B2CInvoice/Issue"
 
@@ -35,6 +37,20 @@ defmodule ECPayInvoice.B2CInvoice do
       "TaxType" => "1",
       "InvType" => "07"
     })
+  end
+
+  @doc """
+  Issues invoice, sends notification if the requests succeeded, and
+  returns the response tuple from the original invoice issuance request.
+  """
+  @spec issue_and_notify(data :: t(), profile :: atom()) :: {:ok, map()} | {:error, term()}
+  def issue_and_notify(%__MODULE__{} = data, profile) do
+    email = data.customer_data.email
+
+    with {:ok, %{"InvoiceNo" => invoice_no}} = response <- Request.perform(data, profile) do
+      InvoiceNotification.send_email_issuance_notfication(invoice_no, email, profile)
+      response
+    end
   end
 
   @spec new(data :: map()) :: t()
