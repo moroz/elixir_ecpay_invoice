@@ -14,6 +14,8 @@ defmodule ECPayInvoice.InvoiceNotification do
   @type event_type :: :issued | :voided | :won | :allowance | :allowance_voided
   @type notification_recipient :: :customer | :merchant | :all
 
+  require Logger
+
   defstruct invoice_no: nil,
             email: nil,
             phone: nil,
@@ -36,7 +38,21 @@ defmodule ECPayInvoice.InvoiceNotification do
       email: email
     }
 
-    ECPayInvoice.Request.perform(payload, profile)
+    result = ECPayInvoice.Request.perform(payload, profile)
+
+    case result do
+      {:ok, _} ->
+        Logger.info("Sent invoice issuance notification for invoice #{invoice_no} to #{email}")
+
+      {:error, reason} ->
+        Logger.error(
+          "Failed to send invoice issuance notification for invoice #{invoice_no}: #{
+            inspect(reason)
+          }"
+        )
+    end
+
+    result
   end
 
   def new_from_invoice_response(%{"InvoiceNo" => invoice_no}) do

@@ -16,7 +16,20 @@ defmodule ECPayInvoice.Config do
   end
 
   def get_config(profile_name) when is_atom(profile_name) do
-    get_all_config() |> Map.get(profile_name)
+    all = get_all_config()
+
+    case Map.fetch(all, profile_name) do
+      {:ok, value} ->
+        value
+
+      _ ->
+        all_keys = Map.keys(all) |> Enum.join(", ")
+
+        raise RuntimeError,
+              "No invoice configuration found for profile #{profile_name}. Available configuration profiles: #{
+                all_keys
+              }."
+    end
   end
 
   def get_hash_iv(profile_name), do: Map.get(get_config(profile_name) || %{}, :hash_iv)

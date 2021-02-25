@@ -4,7 +4,8 @@ defmodule ECPayInvoice.B2CInvoice do
           donate: boolean(),
           items: [ECPayInvoice.InvoiceItem.t()],
           order_id: String.t() | nil,
-          customer_data: ECPayInvoice.CustomerData.t() | nil
+          customer_data: ECPayInvoice.CustomerData.t() | nil,
+          love_code: binary() | nil
         }
   @behaviour ECPayInvoice.Request
 
@@ -12,7 +13,8 @@ defmodule ECPayInvoice.B2CInvoice do
             donate: false,
             items: [],
             order_id: nil,
-            customer_data: nil
+            customer_data: nil,
+            love_code: nil
 
   alias ECPayInvoice.InvoiceItem
   alias ECPayInvoice.B2CInvoice
@@ -21,6 +23,8 @@ defmodule ECPayInvoice.B2CInvoice do
   alias ECPayInvoice.CustomerData
   alias ECPayInvoice.Request
   alias ECPayInvoice.InvoiceNotification
+
+  require Logger
 
   def endpoint, do: "/B2CInvoice/Issue"
 
@@ -31,6 +35,7 @@ defmodule ECPayInvoice.B2CInvoice do
       "MerchantId" => Config.get_merchant_id(profile),
       "RelateNumber" => invoice.order_id || Helpers.generate_unique_id(),
       "Print" => Helpers.normalize_boolean(invoice.print),
+      "LoveCode" => invoice.love_code,
       "Donation" => Helpers.normalize_boolean(invoice.donate),
       "Items" => InvoiceItem.to_api_payload(invoice.items),
       "SalesAmount" => InvoiceItem.sum(invoice.items),
@@ -48,6 +53,7 @@ defmodule ECPayInvoice.B2CInvoice do
     email = data.customer_data.email
 
     with {:ok, %{"InvoiceNo" => invoice_no}} = response <- Request.perform(data, profile) do
+      Logger.info("Issued invoice #{invoice_no}")
       InvoiceNotification.send_email_issuance_notfication(invoice_no, email, profile)
       response
     end
