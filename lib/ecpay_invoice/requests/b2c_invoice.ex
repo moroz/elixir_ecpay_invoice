@@ -56,7 +56,8 @@ defmodule ECPayInvoice.B2CInvoice do
   @spec new(data :: map()) :: t()
   def new(data \\ %{}) do
     customer_data = CustomerData.new(Map.get(data, :customer_data, %{}))
-    params = Map.put(data, :customer_data, customer_data)
+    items = InvoiceItem.parse_list(Map.get(data, :items, []))
+    params = data |> Map.put(:customer_data, customer_data) |> Map.put(:items, items)
     struct!(__MODULE__, params)
   end
 

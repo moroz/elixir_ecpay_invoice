@@ -14,6 +14,10 @@ defmodule ECPayInvoice.InvoiceItem do
   def new(%InvoiceItem{} = item), do: item
   def new(%{} = map), do: struct!(__MODULE__, map)
 
+  def parse_list(list) when is_list(list) do
+    Enum.map(list, &new/1)
+  end
+
   def to_api_payload(%InvoiceItem{} = item) do
     %{
       "ItemName" => item.name,
