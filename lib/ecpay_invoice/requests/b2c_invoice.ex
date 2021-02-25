@@ -3,7 +3,7 @@ defmodule ECPayInvoice.B2CInvoice do
           print: boolean(),
           donate: boolean(),
           items: [ECPayInvoice.InvoiceItem.t()],
-          id: String.t() | nil,
+          order_id: String.t() | nil,
           customer_data: ECPayInvoice.CustomerData.t() | nil
         }
   @behaviour ECPayInvoice.Request
@@ -11,7 +11,7 @@ defmodule ECPayInvoice.B2CInvoice do
   defstruct print: false,
             donate: false,
             items: [],
-            id: nil,
+            order_id: nil,
             customer_data: nil
 
   alias ECPayInvoice.InvoiceItem
@@ -29,7 +29,7 @@ defmodule ECPayInvoice.B2CInvoice do
 
     Map.merge(customer_data, %{
       "MerchantId" => Config.get_merchant_id(profile),
-      "RelateNumber" => invoice.id || Helpers.generate_unique_id(),
+      "RelateNumber" => invoice.order_id || Helpers.generate_unique_id(),
       "Print" => Helpers.normalize_boolean(invoice.print),
       "Donation" => Helpers.normalize_boolean(invoice.donate),
       "Items" => InvoiceItem.to_api_payload(invoice.items),
