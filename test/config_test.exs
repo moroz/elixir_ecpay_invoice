@@ -69,14 +69,20 @@ defmodule ECPayInvoice.ConfigTest do
       assert is_config(actual)
     end
 
-    test "returns nil for non-existent profiles with atom keys" do
+    test "raises ArgumentError for non-existent profiles with atom keys" do
       key = :non_existent
-      refute Config.get_config(key)
+
+      assert_raise ArgumentError, fn ->
+        Config.get_config(key)
+      end
     end
 
-    test "returns nil for non-existent profiles with string keys" do
+    test "raises ArgumentError for non-existent profiles with string keys" do
       key = "non_existent"
-      refute Config.get_config(key)
+
+      assert_raise ArgumentError, fn ->
+        Config.get_config(key)
+      end
     end
 
     test "returns a profile configuration when called with no arguments" do
@@ -144,13 +150,17 @@ defmodule ECPayInvoice.ConfigTest do
 
       test "returns nil when called with a non-existent profile name as atom" do
         with_config(@sample_config) do
-          nil = apply(Config, unquote(function_name), [:non_existent])
+          assert_raise ArgumentError, fn ->
+            apply(Config, unquote(function_name), [:non_existent])
+          end
         end
       end
 
       test "returns nil when called with a non-existent profile name as string" do
         with_config(@sample_config) do
-          nil = apply(Config, unquote(function_name), ["non_existent"])
+          assert_raise ArgumentError, fn ->
+            apply(Config, unquote(function_name), ["non_existent"])
+          end
         end
       end
     end
@@ -178,15 +188,19 @@ defmodule ECPayInvoice.ConfigTest do
       end
     end
 
-    test "returns nil value for a non-existent profile called with string" do
+    test "raises ArgumentError for a non-existent profile called with string" do
       with_config(@sample_config) do
-        nil = Config.development?("non_existent")
+        assert_raise ArgumentError, fn ->
+          Config.development?("non_existent")
+        end
       end
     end
 
-    test "returns nil value for a non-existent profile called with atom" do
+    test "raises ArgumentError for a non-existent profile called with atom" do
       with_config(@sample_config) do
-        nil = Config.development?(:non_existent)
+        assert_raise ArgumentError, fn ->
+          Config.development?(:non_existent)
+        end
       end
     end
   end

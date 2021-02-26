@@ -25,7 +25,7 @@ defmodule ECPayInvoice.Config do
       _ ->
         all_keys = Map.keys(all) |> Enum.join(", ")
 
-        raise RuntimeError,
+        raise ArgumentError,
               "No invoice configuration found for profile #{profile_name}. Available configuration profiles: #{
                 all_keys
               }."
