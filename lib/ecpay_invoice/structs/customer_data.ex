@@ -26,6 +26,7 @@ defmodule ECPayInvoice.CustomerData do
 
   @spec new(params :: map()) :: t()
   def new(params \\ %{}) do
+    params = Map.update!(params, :carrier_type, &parse_carrier_type/1)
     struct!(__MODULE__, params)
   end
 
@@ -41,6 +42,26 @@ defmodule ECPayInvoice.CustomerData do
       "CarrierType" => normalize_carier_type(data)
     }
     |> Helpers.remove_nils()
+  end
+
+  @legal_carrier_types ~w(ecpay natural mobile)a
+
+  def parse_carrier_type(nil), do: nil
+
+  def parse_carrier_type(type) when type in @legal_carrier_types do
+    type
+  end
+
+  def parse_carrier_type(type) when is_binary(type) do
+    as_atom = type |> Macro.underscore() |> String.to_existing_atom()
+
+    case as_atom in @legal_carrier_types do
+      true ->
+        as_atom
+
+      _ ->
+        raise ArgumentError, "Invalid value for carrier_type: #{type}"
+    end
   end
 
   defp normalize_carier_type(%{tax_id: present}) when is_binary(present) do
