@@ -30,6 +30,8 @@ defmodule ECPayInvoice.VerifyBarcode do
     }
   end
 
+  @type error_reason :: :invalid_code | :maintenance | :unknown
+  @spec verify_barcode(barcode :: binary, profile :: atom) :: :ok | {:error, error_reason}
   def verify_barcode(barcode, profile \\ :staging) when is_binary(barcode) do
     barcode
     |> new()
