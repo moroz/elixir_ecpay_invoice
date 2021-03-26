@@ -7,6 +7,9 @@ defmodule ECPayInvoice.Config do
 
   def get_all_config, do: Application.get_env(:ecpay_invoice, :profiles)
 
+  def should_send_invoice_notification?,
+    do: Application.get_env(:ecpay_invoice, :send_notifications, true)
+
   def get_config(profile_name \\ default_profile())
 
   def get_config(nil), do: get_config(default_profile())

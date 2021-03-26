@@ -4,7 +4,7 @@ defmodule EcpayInvoice.MixProject do
   def project do
     [
       app: :ecpay_invoice,
-      version: "0.0.2-beta3",
+      version: "0.0.2-beta4",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -30,7 +30,8 @@ defmodule EcpayInvoice.MixProject do
           development: true
         }
       },
-      default_profile: :staging
+      default_profile: :staging,
+      send_notifications: true
     ]
   end
 

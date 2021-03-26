@@ -33,26 +33,34 @@ defmodule ECPayInvoice.InvoiceNotification do
   @spec send_email_issuance_notfication(invoice_no :: binary, email :: binary, profile :: atom()) ::
           {:ok, map()} | {:error, term()}
   def send_email_issuance_notfication(invoice_no, email, profile) do
-    payload = %Notification{
-      invoice_no: invoice_no,
-      email: email
-    }
+    if Config.should_send_invoice_notification?() do
+      payload = %Notification{
+        invoice_no: invoice_no,
+        email: email
+      }
 
-    result = ECPayInvoice.Request.perform(payload, profile)
+      result = ECPayInvoice.Request.perform(payload, profile)
 
-    case result do
-      {:ok, _} ->
-        Logger.info("Sent invoice issuance notification for invoice #{invoice_no} to #{email}")
+      case result do
+        {:ok, _} ->
+          Logger.info("Sent invoice issuance notification for invoice #{invoice_no} to #{email}")
 
-      {:error, reason} ->
-        Logger.error(
-          "Failed to send invoice issuance notification for invoice #{invoice_no}: #{
-            inspect(reason)
-          }"
-        )
+        {:error, reason} ->
+          Logger.error(
+            "Failed to send invoice issuance notification for invoice #{invoice_no}: #{
+              inspect(reason)
+            }"
+          )
+      end
+
+      result
+    else
+      Logger.info(
+        "Skipping invoice issuance notification for invoice #{invoice_no} because :send_notifications is false"
+      )
+
+      {:ok, :skipped}
     end
-
-    result
   end
 
   def new_from_invoice_response(%{"InvoiceNo" => invoice_no}) do
