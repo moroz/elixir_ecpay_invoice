@@ -10,7 +10,7 @@ defmodule ECPayInvoice.CustomerData do
           carrier_no: String.t() | nil
         }
 
-  @type carrier_type :: nil | :ecpay | :natural | :mobile
+  @type carrier_type :: nil | :ecpay | :natural | :mobile | :love_code
 
   alias ECPayInvoice.CustomerData
   alias ECPayInvoice.Helpers
@@ -44,7 +44,7 @@ defmodule ECPayInvoice.CustomerData do
     |> Helpers.remove_nils()
   end
 
-  @legal_carrier_types ~w(ecpay natural mobile)a
+  @legal_carrier_types ~w(ecpay natural mobile love_code)a
 
   def parse_carrier_type(nil), do: nil
 
@@ -71,6 +71,7 @@ defmodule ECPayInvoice.CustomerData do
   defp normalize_carier_type(:ecpay), do: "1"
   defp normalize_carier_type(:natural), do: "2"
   defp normalize_carier_type(:mobile), do: "3"
+  defp normalize_carier_type(:love_code), do: ""
 
   defp normalize_carier_type(%{carrier_type: type}), do: normalize_carier_type(type)
 
