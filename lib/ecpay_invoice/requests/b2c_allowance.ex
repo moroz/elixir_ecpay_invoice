@@ -3,7 +3,6 @@ defmodule ECPayInvoice.B2CAllowance do
           invoice_no: String.t() | nil,
           invoice_date: DateTime | nil,
           # allowance_notify: NotificationCategory # TODO
-          # Must be an UTF8 encoded string https://www.ecpay.com.tw/Content/files/gw_i100EN.pdf#page=83&zoom=100,277,108
           customer_name: String.t() | nil,
           notify_mail: String.t() | nil,
           notify_phone: String.t() | nil,
