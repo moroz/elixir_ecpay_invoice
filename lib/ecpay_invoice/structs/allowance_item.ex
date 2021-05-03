@@ -6,19 +6,19 @@ defmodule ECPayInvoice.AllowanceItem do
           unit_price: integer()
         }
 
-  alias ECPayInvoice.InvoiceItem
+  alias ECPayInvoice.AllowanceItem
 
   defstruct name: nil, count: 1, unit: "式", unit_price: nil
 
   @spec new(params :: map() | t()) :: t()
-  def new(%InvoiceItem{} = item), do: item
+  def new(%AllowanceItem{} = item), do: item
   def new(%{} = map), do: struct!(__MODULE__, map)
 
   def parse_list(list) when is_list(list) do
     Enum.map(list, &new/1)
   end
 
-  def to_api_payload(%InvoiceItem{} = item) do
+  def to_api_payload(%AllowanceItem{} = item) do
     %{
       "ItemName" => item.name,
       "ItemCount" => item.count,
